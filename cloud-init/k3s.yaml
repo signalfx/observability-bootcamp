@@ -1,23 +1,27 @@
 #cloud-config
 ssh_pwauth: yes
-password: Observability2022!
+password: Observability2021!
 chpasswd:
   expire: false
 
 package_update: true
 
 apt:
+  preserve_sources_list: false
   sources_list: |
-    deb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse
-    deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse
-    deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse
-    deb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse
+    deb http://de.archive.ubuntu.com/ubuntu hirsute main restricted universe multiverse
+    deb http://de.archive.ubuntu.com/ubuntu hirsute-updates main restricted universe multiverse
+    deb http://de.archive.ubuntu.com/ubuntu hirsute-security main restricted universe multiverse
+    deb http://de.archive.ubuntu.com/ubuntu hirsute-backports main restricted universe multiverse
 
 packages:
   - unzip
+  - git
   - shellinabox
   - lynx
   - w3m
+  - gnupg2
+  - docker-compose
 
 write_files:
   - path: /etc/skel/.profile
@@ -65,6 +69,30 @@ write_files:
       export INSTANCE
       export KUBECONFIG=/home/ubuntu/.kube/config
     append: true
+  - path: /etc/rancher/k3s/registries.yaml
+    permissions: '0600'
+    owner: root:root
+    content: |
+      mirrors:
+        docker.registry:
+          endpoint:
+            - "http://docker.registry:9999"
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "insecure-registries" : ["docker.registry:9999"]
+      }
+  - path: /usr/local/bin/setup-docker-registry.sh
+    permissions: '0744'
+    content: |
+      #!/usr/bin/env bash
+      REGISTRY_NAME=docker.registry
+      REGISTRY_PORT=9999
+      NODE_IP=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
+      echo "$NODE_IP $REGISTRY_NAME" | tee -a /etc/hosts
+      echo "$NODE_IP $REGISTRY_NAME" | tee -a /etc/cloud/templates/hosts.debian.tmpl
+      systemctl restart docker
+      systemctl restart k3s
 
 runcmd:
   # Install K3s
@@ -74,20 +102,8 @@ runcmd:
   # Install K9s (Kubernetes UI)
   - curl -S -OL https://github.com/derailed/k9s/releases/download/v0.25.4/k9s_Linux_x86_64.tar.gz
   - tar xfz k9s_Linux_x86_64.tar.gz -C /usr/local/bin/ k9s
-  # Download Workshop
-  - export WSVERSION=0.1
-  - 'export WSARCHIVE=$([ "$WSVERSION" = "master" ] && echo "master" || echo "v$WSVERSION")'
-  - curl -s -OL https://github.com/signalfx/observability-workshop/archive/$WSARCHIVE.zip
-  - unzip -qq $WSARCHIVE.zip -d /home/ubuntu/
-  - mv /home/ubuntu/observability-workshop-$WSVERSION /home/ubuntu/workshop
-  # Download Splunk Observability Cloud Jumpstart
-  - curl -s -L https://github.com/signalfx/signalfx-jumpstart/archive/master.zip -o jumpstart.zip
-  - unzip -qq jumpstart.zip -d /home/ubuntu/
-  - mv /home/ubuntu/signalfx-jumpstart-master /home/ubuntu/signalfx-jumpstart
-  # Download Microservices Demo
-  #- curl -s -L https://github.com/signalfx/microservices-demo/archive/master.zip -o microservices-demo.zip
-  #- unzip -qq microservices-demo.zip -d /home/ubuntu/
-  #- mv /home/ubuntu/microservices-demo-master /home/ubuntu/microservices-demo
+  # Download Bootcamp
+  - git clone https://github.com/a-staebler/o11y-bootcamp /home/ubuntu/o11y-bootcamp
   # Configure motd
   - curl -s https://raw.githubusercontent.com/signalfx/observability-workshop/master/cloud-init/motd -o /etc/motd
   - chmod -x /etc/update-motd.d/*
@@ -101,12 +117,6 @@ runcmd:
   # Configure shellinabox port and disable ssl then restart
   - sed -i 's/SHELLINABOX_PORT=4200/SHELLINABOX_PORT=6501/'  /etc/default/shellinabox
   - sed -i "s/\"--no-beep\"/\"--no-beep --disable-ssl\"/" /etc/default/shellinabox
-  - sudo service shellinabox restart
-  # Install AWS CLI
-  #- curl -s https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip
-  #- unzip -qq awscliv2.zip
-  #- ./aws/install
-  # Install eksctl for AWS/EKS
-  #- curl -s --silent --location https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz | tar xz -C /tmp
-  #- mv /tmp/eksctl /usr/local/bin/
-
+  - service shellinabox restart
+  - bash /usr/local/bin/setup-docker-registry.sh
+  - kubectl apply -f ~/o11y-bootcamp/k3s/registry/registry.yaml
