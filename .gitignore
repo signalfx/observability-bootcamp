@@ -1,0 +1,13 @@
+.vscode
+.DS_Store
+site
+nohup.out
+terraform.tfstate
+terraform.tfstate.d/
+terraform.tfstate.backup
+.terraform.tfstate.lock.info
+.terraform
+secret.tfvars
+terraform.tfvars
+.terraform.lock.hcl
+venv/
