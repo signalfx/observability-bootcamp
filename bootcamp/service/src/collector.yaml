@@ -1,4 +1,6 @@
 receivers:
+  prometheus_simple:
+    endpoint: "host.docker.internal:5000"
   hostmetrics:
     collection_interval: 10s
     scrapers:
@@ -26,6 +28,6 @@ exporters:
 service:
   pipelines:
     metrics:
-      receivers: [hostmetrics]
+      receivers: [hostmetrics, prometheus_simple]
       processors: [memory_limiter, batch]
       exporters: [signalfx]
