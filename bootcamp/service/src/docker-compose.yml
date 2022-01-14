@@ -3,6 +3,7 @@ version: '3'
 services:
   wordcount:
     build: .
+    image: docker.registry:9999/wordcount
     expose:
       - "8000"
     ports:
