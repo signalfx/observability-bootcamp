@@ -1,4 +1,8 @@
 receivers:
+  smartagent/redis:
+    type: collectd/redis
+    host: cache
+    port: 6379
   prometheus_simple:
     endpoint: "wordcount:5000"
   hostmetrics:
@@ -28,6 +32,6 @@ exporters:
 service:
   pipelines:
     metrics:
-      receivers: [hostmetrics, prometheus_simple]
+      receivers: [hostmetrics, prometheus_simple, smartagent/redis]
       processors: [memory_limiter, batch]
       exporters: [signalfx]
