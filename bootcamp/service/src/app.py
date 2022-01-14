@@ -1,9 +1,11 @@
 import json
+import os
 import re
 from flask import Flask, request, Response
 import prometheus_client
 from prometheus_client.exposition import CONTENT_TYPE_LATEST
 from prometheus_client import Counter
+import redis
 
 
 def letter_only(text):
@@ -36,6 +38,8 @@ c_recv = Counter('characters_recv', 'Number of characters received')
 c_norm = Counter('characters_norm', 'Number of normalized characters processed')
 c_word = Counter('words_processed', 'Number of words processed')
 
+r = redis.Redis.from_url(os.getenv('REDIS_URL'))
+
 
 @app.route('/metrics')
 def metrics():
@@ -46,19 +50,26 @@ def metrics():
 def wordcount():
     f = request.files['text']
     fn = f.filename
-    print(fn)
-    data = request.files['text'].read().decode('utf-8')
-    c_recv.inc(len(data))
 
-    text = normalize(data)
-    c_norm.inc(len(text))
+    cached = r.get(fn)
+    if cached is not None:
+        result = cached
+    else:
+        data = request.files['text'].read().decode('utf-8')
+        c_recv.inc(len(data))
 
-    wordstream = split(text)
-    c_word.inc(len(wordstream))
+        text = normalize(data)
+        c_norm.inc(len(text))
 
-    counts = count(wordstream)
+        wordstream = split(text)
+        c_word.inc(len(wordstream))
 
-    return json.dumps(sorted(counts.items(), key=lambda x: x[1])[-10:])
+        counts = count(wordstream)
+
+        result = json.dumps(sorted(counts.items(), key=lambda x: x[1])[-10:])
+        r.set(fn, result)
+
+    return result
 
 
 if __name__ == '__main__':
