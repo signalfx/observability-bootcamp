@@ -1,10 +1,12 @@
+import json
 import re
-from unicodedata import category
+from flask import Flask, request, Response
 
 
 def letter_only(text):
-    return re.sub("[^\w' ]", "",
-             re.sub("[^\w']", " ", text))
+    return re.sub(r"\s+", " ",
+                  re.sub(r"[^\w' ]", "",
+                         re.sub(r"[^\w']", " ", text)))
 
 
 def normalize(text):
@@ -26,10 +28,18 @@ def count(text):
     return words
 
 
-with open("hamlet.txt", encoding="UTF-8") as file:
-    hamlet = file.read()
-text = normalize(hamlet)
-wordstream = split(text)
-counts = count(wordstream)
+app = Flask(__name__)
 
-print(sorted(counts.items(), key=lambda x: x[1])[-10:])
+
+@app.route('/wordcount', methods=['POST'])
+def wordcount():
+    data = request.files['text'].read().decode('utf-8')
+    text = normalize(data)
+    wordstream = split(text)
+    counts = count(wordstream)
+
+    return json.dumps(sorted(counts.items(), key=lambda x: x[1])[-10:])
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
