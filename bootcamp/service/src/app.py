@@ -1,6 +1,9 @@
 import json
 import re
 from flask import Flask, request, Response
+import prometheus_client
+from prometheus_client.exposition import CONTENT_TYPE_LATEST
+from prometheus_client import Counter
 
 
 def letter_only(text):
@@ -29,13 +32,30 @@ def count(text):
 
 
 app = Flask(__name__)
+c_recv = Counter('characters_recv', 'Number of characters received')
+c_norm = Counter('characters_norm', 'Number of normalized characters processed')
+c_word = Counter('words_processed', 'Number of words processed')
+
+
+@app.route('/metrics')
+def metrics():
+    return Response(prometheus_client.generate_latest(), mimetype=CONTENT_TYPE_LATEST)
 
 
 @app.route('/wordcount', methods=['POST'])
 def wordcount():
+    f = request.files['text']
+    fn = f.filename
+    print(fn)
     data = request.files['text'].read().decode('utf-8')
+    c_recv.inc(len(data))
+
     text = normalize(data)
+    c_norm.inc(len(text))
+
     wordstream = split(text)
+    c_word.inc(len(wordstream))
+
     counts = count(wordstream)
 
     return json.dumps(sorted(counts.items(), key=lambda x: x[1])[-10:])
