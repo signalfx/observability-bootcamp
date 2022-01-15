@@ -2,33 +2,33 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f resolved.yaml --volumes configMap -o k8s/
+    kompose.cmd: kompose convert -f resolved.yaml --volumes configMap -o k8s
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: wordcount
-  name: wordcount
+    io.kompose.service: public-api
+  name: public-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: wordcount
+      io.kompose.service: public-api
   strategy: {}
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f resolved.yaml --volumes configMap -o k8s/
+        kompose.cmd: kompose convert -f resolved.yaml --volumes configMap -o k8s
         kompose.version: 1.26.1 (HEAD)
       creationTimestamp: null
       labels:
-        io.kompose.service: wordcount
+        io.kompose.service: public-api
     spec:
       containers:
         - env:
             - name: REDIS_URL
               value: redis://cache
-          image: docker.registry/wordcount
-          name: wordcount
+          image: docker.registry/public_api
+          name: public-api
           ports:
             - containerPort: 5000
             - containerPort: 8000

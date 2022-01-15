@@ -1,0 +1,5 @@
+flask
+prometheus-client
+redis
+requests
+splunk-opentelemetry[all]

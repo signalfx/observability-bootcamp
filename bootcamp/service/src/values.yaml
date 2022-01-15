@@ -1,8 +1,14 @@
 agent:
   config:
     receivers:
-      prometheus_simple:
-        endpoint: "wordcount:8000"
+      prometheus_simple/api:
+        endpoint: "public-api:8000"
+      prometheus_simple/normalize:
+        endpoint: "normalize:5000"
+      prometheus_simple/split:
+        endpoint: "split:5000"
+      prometheus_simple/count:
+        endpoint: "count:5000"
       receiver_creator:
         receivers:
           smartagent/redis:
@@ -15,7 +21,10 @@ agent:
           receivers:
             - hostmetrics
             - kubeletstats
-            - prometheus_simple
+            - prometheus_simple/api
+            - prometheus_simple/normalize
+            - prometheus_simple/split
+            - prometheus_simple/count
             - receiver_creator
     extensions:
       zpages:
