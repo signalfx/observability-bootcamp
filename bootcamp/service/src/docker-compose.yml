@@ -3,12 +3,16 @@ version: '3'
 services:
   public_api:
     build: ./public_api
+    environment:
+      - OTEL_SERVICE_NAME=public_api
+      - SPLUNK_ACCESS_TOKEN
+      - OTEL_TRACES_EXPORTER
+      - OTEL_EXPORTER_JAEGER_ENDPOINT
+      - REDIS_URL=redis://cache
     expose:
       - "8000"
     ports:
       - "8000:5000"
-    environment:
-      - REDIS_URL=redis://cache
     depends_on:
       - "redis"
       - normalize
@@ -16,14 +20,29 @@ services:
       - count
   normalize:
     build: ./normalize
+    environment:
+      - OTEL_SERVICE_NAME=normalize
+      - SPLUNK_ACCESS_TOKEN
+      - OTEL_TRACES_EXPORTER
+      - OTEL_EXPORTER_JAEGER_ENDPOINT
     expose:
       - "5000"
   split:
     build: ./split
+    environment:
+      - OTEL_SERVICE_NAME=split
+      - SPLUNK_ACCESS_TOKEN
+      - OTEL_TRACES_EXPORTER
+      - OTEL_EXPORTER_JAEGER_ENDPOINT
     expose:
       - "5000"
   count:
     build: ./count
+    environment:
+      - OTEL_SERVICE_NAME=count
+      - SPLUNK_ACCESS_TOKEN
+      - OTEL_TRACES_EXPORTER
+      - OTEL_EXPORTER_JAEGER_ENDPOINT
     expose:
       - "5000"
   redis:
