@@ -25,29 +25,8 @@ packages:
 
 write_files:
   - path: /etc/skel/.profile
+    append: true
     content: |
-      helm() {
-        if [ -z ${ACCESS_TOKEN+x} ]; then echo "ACCESS_TOKEN is unset. Please export ACCESS_TOKEN=YOUR_TOKEN"; return; fi
-        if [[ ${#ACCESS_TOKEN} < 22 ]]; then echo "ACCESS_TOKEN looks too short. It should be a string of at least 22 characters."; return; fi
-        if [ -z ${REALM+x} ]; then echo "REALM is unset. Please export REALM=YOUR_REALM"; return; fi
-        if [[ ! $REALM  =~ ^(us0|us1|us2|eu0)$ ]]; then echo "REALM is not one of the supported realms. Check that it is one of us0, us1, us2 or eu0."; return; fi
-
-        echo "Using ACCESS_TOKEN=$ACCESS_TOKEN"
-        echo "Using REALM=$REALM"
-
-        command helm "$@"
-      }
-
-      terraform() {
-        if [ -z ${ACCESS_TOKEN+x} ]; then echo "ACCESS_TOKEN is unset. Please export ACCESS_TOKEN=YOUR_TOKEN"; return; fi
-        if [ -z ${REALM+x} ]; then echo "REALM is unset. Please export REALM=YOUR_REALM"; return; fi
-
-        echo "Using ACCESS_TOKEN=$ACCESS_TOKEN"
-        echo "Using REALM=$REALM"
-
-        command terraform "$@"
-      }
-
       echo "Waiting for cloud-init status..."
       if ! /usr/bin/timeout 180 grep -q 'Cloud-init .*finished at' <(tail -f /var/log/cloud-init-output.log); then
         echo "Instance setup did not complete after 3 minutes. Please try again.";
@@ -55,20 +34,14 @@ write_files:
         echo "Your instance is ready!";
       fi
 
-      if [ -e ~/.instance ]; then
-        INSTANCE=$(cat ~/.instance)
-      fi
-      if [ -z ${INSTANCE+x} ]; then
-        INSTANCE=$(cat /dev/urandom | base64 | tr -dc 'a-z' | head -c4)
-        sudo sed -i "s/127.0.0.1.*/127.0.0.1 $INSTANCE.local $INSTANCE localhost/" /etc/hosts
-        sudo hostnamectl set-hostname $INSTANCE
-        # Set color prompt
-        export PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\$INSTANCE\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
-        echo $INSTANCE > ~/.instance
+      if [ -e /etc/.instance ]; then
+        INSTANCE=$(cat /etc/.instance)
       fi
       export INSTANCE
+
+      # Set color prompt
+      export PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\$INSTANCE\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
       export KUBECONFIG=/home/ubuntu/.kube/config
-    append: true
   - path: /etc/rancher/k3s/registries.yaml
     permissions: '0600'
     owner: root:root
@@ -88,15 +61,26 @@ write_files:
       #!/usr/bin/env bash
       REGISTRY_NAME=docker.registry
       REGISTRY_PORT=9999
-      NODE_IP=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
+      NODE_IP=$(ip -o -4 addr | awk '$2 != "lo" { print $4}' | sed -e 's,/[[:digit:]]\+$,,')
       echo "$NODE_IP $REGISTRY_NAME" | tee -a /etc/hosts
       echo "$NODE_IP $REGISTRY_NAME" | tee -a /etc/cloud/templates/hosts.debian.tmpl
       systemctl restart docker
-      systemctl restart k3s
+  - path: /usr/local/bin/local-setup.sh
+    permissions: "0744"
+    content: |
+      if [ -e /etc/.instance ]; then
+        INSTANCE=$(cat /etc/.instance)
+      fi
+      if [ -z ${INSTANCE+x} ]; then
+        INSTANCE=$(cat /dev/urandom | base64 | tr -dc 'a-z' | head -c4)
+        sed -i "s/127.0.0.1.*/127.0.0.1 $INSTANCE.local $INSTANCE localhost/" /etc/hosts
+        sed -i "s/127.0.0.1.*/127.0.0.1 $INSTANCE.local $INSTANCE localhost/" /etc/cloud/templates/hosts.debian.tmpl
+        sudo hostnamectl set-hostname $INSTANCE
+        echo $INSTANCE > /etc/.instance
+      fi
+      export INSTANCE
 
 runcmd:
-  # Install K3s
-  - curl -sfL https://get.k3s.io | sh -
   # Install Helm
   - curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
   # Install K9s (Kubernetes UI)
@@ -119,4 +103,7 @@ runcmd:
   - sed -i "s/\"--no-beep\"/\"--no-beep --disable-ssl\"/" /etc/default/shellinabox
   - service shellinabox restart
   - bash /usr/local/bin/setup-docker-registry.sh
-  - kubectl apply -f ~/o11y-bootcamp/k3s/registry/registry.yaml
+  - bash /usr/local/bin/local-setup.sh
+  # Install K3s
+  - curl -sfL https://get.k3s.io | sh -
+  - /usr/local/bin/kubectl apply -f /home/ubuntu/o11y-bootcamp/k3s/registry/registry.yaml
