@@ -3,8 +3,14 @@ receivers:
     type: collectd/redis
     host: cache
     port: 6379
-  prometheus_simple:
-    endpoint: "wordcount:5000"
+  prometheus_simple/public_api:
+    endpoint: "public_api:5000"
+  prometheus_simple/normalize:
+    endpoint: "normalize:5000"
+  prometheus_simple/split:
+    endpoint: "split:5000"
+  prometheus_simple/count:
+    endpoint: "count:5000"
   hostmetrics:
     collection_interval: 10s
     scrapers:
@@ -32,6 +38,6 @@ exporters:
 service:
   pipelines:
     metrics:
-      receivers: [hostmetrics, prometheus_simple, smartagent/redis]
+      receivers: [hostmetrics, smartagent/redis, prometheus_simple/public_api, prometheus_simple/normalize, prometheus_simple/split, prometheus_simple/count]
       processors: [memory_limiter, batch]
       exporters: [signalfx]

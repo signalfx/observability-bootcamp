@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-  wordcount:
-    build: .
+  public_api:
+    build: ./public_api
     expose:
       - "8000"
     ports:
@@ -11,6 +11,21 @@ services:
       - REDIS_URL=redis://cache
     depends_on:
       - "redis"
+      - normalize
+      - split
+      - count
+  normalize:
+    build: ./normalize
+    expose:
+      - "5000"
+  split:
+    build: ./split
+    expose:
+      - "5000"
+  count:
+    build: ./count
+    expose:
+      - "5000"
   redis:
     image: redis
     container_name: cache
