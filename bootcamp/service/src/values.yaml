@@ -1,0 +1,22 @@
+agent:
+  config:
+    receivers:
+      prometheus_simple:
+        endpoint: "wordcount:8000"
+      receiver_creator:
+        receivers:
+          smartagent/redis:
+            rule: type == "port" && pod.name matches "redis" && port == 6379
+            config:
+              type: collectd/redis
+    service:
+      pipelines:
+        metrics:
+          receivers:
+            - hostmetrics
+            - kubeletstats
+            - prometheus_simple
+            - receiver_creator
+    extensions:
+      zpages:
+        endpoint: 0.0.0.0:55679
