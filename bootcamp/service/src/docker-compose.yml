@@ -5,9 +5,9 @@ services:
     build: ./public_api
     environment:
       - OTEL_SERVICE_NAME=public_api
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_RESOURCE_ATTRIBUTES
       - SPLUNK_ACCESS_TOKEN
-      - OTEL_TRACES_EXPORTER
-      - OTEL_EXPORTER_JAEGER_ENDPOINT
       - REDIS_URL=redis://cache
     expose:
       - "8000"
@@ -22,27 +22,27 @@ services:
     build: ./normalize
     environment:
       - OTEL_SERVICE_NAME=normalize
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_RESOURCE_ATTRIBUTES
       - SPLUNK_ACCESS_TOKEN
-      - OTEL_TRACES_EXPORTER
-      - OTEL_EXPORTER_JAEGER_ENDPOINT
     expose:
       - "5000"
   split:
     build: ./split
     environment:
       - OTEL_SERVICE_NAME=split
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_RESOURCE_ATTRIBUTES
       - SPLUNK_ACCESS_TOKEN
-      - OTEL_TRACES_EXPORTER
-      - OTEL_EXPORTER_JAEGER_ENDPOINT
     expose:
       - "5000"
   count:
     build: ./count
     environment:
       - OTEL_SERVICE_NAME=count
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_RESOURCE_ATTRIBUTES
       - SPLUNK_ACCESS_TOKEN
-      - OTEL_TRACES_EXPORTER
-      - OTEL_EXPORTER_JAEGER_ENDPOINT
     expose:
       - "5000"
   redis:
@@ -55,6 +55,9 @@ services:
     environment:
       - SPLUNK_ACCESS_TOKEN
       - SPLUNK_REALM
+      - SPLUNK_TRACE_URL=https://ingest.${SPLUNK_REALM}.signalfx.com/v2/trace
+      - SPLUNK_API_URL=https://api.${SPLUNK_REALM}.signalfx.com
+      - SPLUNK_INGEST_URL=https://ingest.${SPLUNK_REALM}.signalfx.com
       - SPLUNK_CONFIG=/etc/collector.yaml
     ports:
       - "4317:4317"
@@ -68,3 +71,4 @@ services:
       - "14268:14268"
     volumes:
       - "./collector.yaml:/etc/collector.yaml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
