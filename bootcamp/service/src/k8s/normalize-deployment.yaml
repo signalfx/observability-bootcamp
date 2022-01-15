@@ -24,7 +24,18 @@ spec:
         io.kompose.service: normalize
     spec:
       containers:
-        - image: docker.registry/normalize
+        - env:
+            - name: SPLUNK_OTEL_AGENT
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://$(SPLUNK_OTEL_AGENT):4317
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment=YOURNAME-dev
+            - name: OTEL_SERVICE_NAME
+              value: normalize
+          image: docker.registry/normalize
           name: normalize
           ports:
             - containerPort: 5000
