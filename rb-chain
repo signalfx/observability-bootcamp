@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# sort branches starting with number by name, length; skip first
+BRANCHES=$(git branch | sed -e 's/^ *//' -e 's/^\* //' | grep -E '^\d+' | sort | tail -n +2)
+
+# rebase first
+git rebase main 01service
+
+# rebase chain
+git rebase-chain "$BRANCHES"
