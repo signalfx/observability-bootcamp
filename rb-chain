@@ -1,17 +1,26 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -euo pipefail
+
+rb_chain() {
+	CHAIN=("$@")
+	CHEAD=${CHAIN[@]:0:1}
+	FIRST=${CHAIN[@]:1:1}
+	TAIL=${CHAIN[@]:2}
+
+	for branch in "${CHAIN[@]}"; do
+		git checkout "$branch"
+	done
+
+	git checkout "$CHEAD"
+	git rebase "$CHEAD" "$FIRST"
+	git rebase-chain "$TAIL"
+}
 
 # sort branches starting with number by name, length; skip first
 # BRANCHES=$(git branch | sed -e 's/^ *//' -e 's/^\* //' | grep -E '^\d+' | sort | tail -n +2)
-CHAIN1="02service-metrics 03service-metrics-otel 04service-metrics-prom 05docker 06docker-compose 07docker-compose-otel 08docker-compose-redis 08docker-compose-redis-otel 10microservices 10microservices-autoi 11infra-correlation"
-CHAIN2="09k8s-otel 12microservices-k8s 12microservices-k8s-autoi"
+CHAIN1=(main 01service 02service-metrics 03service-metrics-otel 04service-metrics-prom 05docker 06docker-compose 07docker-compose-otel 08docker-compose-redis 08docker-compose-redis-otel 10microservices 10microservices-autoi 11infra-correlation)
+CHAIN2=(08docker-compose-redis-otel 09k8s 09k8s-otel 12microservices-k8s 12microservices-k8s-autoi)
 
-# rebase first
-git rebase main 01service
-
-# rebase chain
-git rebase-chain "$CHAIN1"
-
-git rebase 08docker-compose-redis-otel 09k8s
-git rebase-chain "$CHAIN2"
+rb_chain "${CHAIN1[@]}"
+rb_chain "${CHAIN2[@]}"
