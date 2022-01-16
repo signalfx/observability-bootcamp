@@ -81,6 +81,9 @@ write_files:
       fi
       export INSTANCE
 
+      alias kc='sudo kubectl'
+      alias gs='git status'
+
 runcmd:
   # Install Helm
   - curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
