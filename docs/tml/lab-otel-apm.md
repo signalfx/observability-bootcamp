@@ -11,11 +11,13 @@
 
 The development team has broken up the monolithic service into microservices baesd on the `docker-compose` setup. Switch to the provided milestone `10microservices` with the instructions from "Getting Started".
 
-Test the service with
+Test the service with:
 
-```bash
-curl -X POST http://127.0.0.1:8000/api -F text=@hamlet.txt
-```
+=== "Shell Command"
+
+    ```bash
+    curl -X POST http://127.0.0.1:8000/api -F text=@hamlet.txt
+    ```
 
 Add auto-instrumentation to the `public_api` microservice using the [Splunk distribution of OpenTelemetry Python][splunk-otel-python]. Review the [documentation][splunk-py-instrument] and the [Getting Started] steps and apply it to `Dockerfile`.
 
@@ -40,39 +42,49 @@ The Kubernetes manifests are located in the `k8s` folder. Add auto-instrumentati
 
 Install the OpenTelemetry Collector to the environment using [Splunk's helm chart][splunk-otel-helm] and use the provided `values.yaml`:
 
-```bash
-helm install my-splunk-otel-collector --set="splunkObservability.realm=${SPLUNK_REALM},splunkObservability.accessToken=${SPLUNK_ACCESS_TOKEN},clusterName=${CLUSTER_NAME}" splunk-otel-collector-chart/splunk-otel-collector -f values.yaml
-```
+=== "Shell Command"
+
+    ```bash
+    helm install my-splunk-otel-collector --set="splunkObservability.realm=${SPLUNK_REALM},splunkObservability.accessToken=${SPLUNK_ACCESS_TOKEN},clusterName=${CLUSTER_NAME}" splunk-otel-collector-chart/splunk-otel-collector -f values.yaml
+    ```
 
 Rebuild the container images for the private registry:
 
-```bash
-docker-compose build
-```
+=== "Shell Command"
+
+
+    ```bash
+    docker-compose build
+    ```
 
 Push the images to the private registry:
 
-```bash
-docker-compose push
-```
+=== "Shell Command"
+
+    ```bash
+    docker-compose push
+    ```
 
 Deploy to the cluster with
 
-```bash
-kubectl apply -f k8s
-```
+=== "Shell Command"
+
+    ```bash
+    kubectl apply -f k8s
+    ```
 
 Test the service with
 
-```bash
-ENDPOINT=$(kubectl get service/public-api -o jsonpath='{.spec.clusterIP}')
-curl http://$ENDPOINT:8000/api -F text=@hamlet.txt
-```
+=== "Shell Command"
+
+    ```bash
+    ENDPOINT=$(kubectl get service/public-api -o jsonpath='{.spec.clusterIP}')
+    curl http://$ENDPOINT:8000/api -F text=@hamlet.txt
+    ```
 
 The milestone for this task is `12microservices-k8s-autoi`. It has auto-instrumentation applied for *all* microservices.
 
 ## Task 13: Using OpenTelemetry instrumentation
-
 
 ## Future Tasks
 
@@ -80,7 +92,7 @@ TODO YOUR Idea here? Let us know!
 
 TODO metrics method being traced - how to disable?
 
-```
+```python
 from opentelemetry.context import attach, detach, set_value
 token = attach(set_value("suppress_instrumentation", True))
 ```

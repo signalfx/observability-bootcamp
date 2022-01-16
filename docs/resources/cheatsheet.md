@@ -1,3 +1,5 @@
+# Cheatsheet
+
 ## SMART AGENT and OTEL COLLECTOR COMMANDS
 
 ### CONNECTIVITY CHECK
@@ -113,7 +115,7 @@ chcon -t bin_t /usr/lib/signalfx-agent/bin/signalfx-agent
 
 SMART AGENT STANDARD PORTS ARE 9080 and 8095
 
-## KUBERNETES ##
+## KUBERNETES
 
 ### SMART AGENT CHECK AGENT STATUS
 

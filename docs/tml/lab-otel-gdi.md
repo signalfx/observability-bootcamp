@@ -41,7 +41,6 @@ This is because your work conflicts with changes on the milestone. You have the 
 
     You will have to re-apply any local changes like settings tokens or names.
 
-
 1. To preserve your work but move it out of the way, you can use
 
     === "Shell Command"
@@ -110,9 +109,11 @@ Let's get python sorted first. On a provided AWS instance, `python3` is already 
 
 If you are on a Mac:
 
-```bash
-brew install python@3
-```
+=== "Shell Command"
+
+    ```bash
+    brew install python@3
+    ```
 
 On another system, install a recent version of python (i.e. 3.x) with your package manager.
 
