@@ -36,8 +36,9 @@ write_files:
 
       if [ -e /etc/.instance ]; then
         INSTANCE=$(cat /etc/.instance)
+        CLUSTER_NAME="$INSTANCE-cluster"
       fi
-      export INSTANCE
+      export INSTANCE CLUSTER_NAME
 
       # Set color prompt
       export PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\$INSTANCE\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
