@@ -101,5 +101,6 @@ nav:
   - Home: index.md
   - Observability Bootcamp: tml/index.md
   - Resources:
+    - Cheatsheet: resources/cheatsheet.md
     - Links: resources/index.md
     - FAQ: resources/faq.md
