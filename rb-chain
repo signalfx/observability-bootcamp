@@ -45,7 +45,9 @@ CHAIN2=(
 )
 
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-zip -9r "../pre-rebase-snapshot_$TS.zip" .
+SNAP=../pre-rebase-snapshot_$TS.tar.zst
+echo "creating $SNAP..."
+tar --use-compress-program pzstd -cf "$SNAP" .
 
 rb_chain "${CHAIN1[@]}"
 rb_chain "${CHAIN2[@]}"
