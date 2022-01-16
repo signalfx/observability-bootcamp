@@ -3,10 +3,23 @@ provider "aws" {
   region  = var.aws_region
 }
 
+locals {
+  common_tags = {
+    Component = "o11y-for-${var.slug}"
+    Environment = "production"
+  }
+}
+
 resource "aws_vpc" "o11y-ws-vpc" {
   cidr_block = "10.13.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
+  tags = merge(
+    local.common_tags,
+    {
+      "Name" = "o11y-ws-vpc"
+    }
+  )
 }
 
 resource "aws_subnet" "o11y-ws-subnet" {
@@ -14,6 +27,12 @@ resource "aws_subnet" "o11y-ws-subnet" {
   cidr_block              = "10.13.0.0/24"
   map_public_ip_on_launch = true
   # availability_zone       = "${var.aws_region}a"
+  tags = merge(
+    local.common_tags,
+    {
+      "Name" = "o11y-ws-subnet"
+    }
+  )
 }
 
 resource "aws_security_group" "o11y-ws-sg" {
@@ -81,14 +100,33 @@ resource "aws_security_group" "o11y-ws-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = merge(
+    local.common_tags,
+    {
+      "Name" = "o11y-ws-sg"
+    }
+  )
 }
 
 resource "aws_internet_gateway" "o11y-ws-ig" {
- vpc_id = aws_vpc.o11y-ws-vpc.id
+  vpc_id = aws_vpc.o11y-ws-vpc.id
+  tags = merge(
+    local.common_tags,
+    {
+      "Name" = "o11y-ws-igw"
+    }
+  )
 }
 
 resource "aws_route_table" "o11y-ws-rt" {
- vpc_id = aws_vpc.o11y-ws-vpc.id
+  vpc_id = aws_vpc.o11y-ws-vpc.id
+  tags = merge(
+    local.common_tags,
+    {
+      "Name" = "o11y-ws-rt"
+    }
+  )
 }
 
 resource "aws_route" "o11y-ws-route" {
@@ -100,7 +138,7 @@ resource "aws_route" "o11y-ws-route" {
 resource "aws_route_table_association" "o11y-ws-rta" {
   subnet_id      = aws_subnet.o11y-ws-subnet.id
   route_table_id = aws_route_table.o11y-ws-rt.id
-} # end resource
+}
 
 resource "aws_instance" "observability-instance" {
   count                  = var.aws_instance_count
@@ -114,10 +152,12 @@ resource "aws_instance" "observability-instance" {
     volume_size = var.instance_disk_aws
   }
 
-  tags = {
-    Name = "observability-${count.index + 1}"
-  }
-
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "observability-${count.index + 1}"
+    }
+  )
 }
 
 output "ip" {

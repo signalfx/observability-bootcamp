@@ -11,3 +11,4 @@ secret.tfvars
 terraform.tfvars
 .terraform.lock.hcl
 venv/
+tfplan
