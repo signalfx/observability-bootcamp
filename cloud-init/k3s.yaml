@@ -98,10 +98,6 @@ runcmd:
   # Install Terraform
   - curl -S -OL https://releases.hashicorp.com/terraform/1.0.11/terraform_1.0.11_linux_amd64.zip
   - unzip -qq terraform_1.0.11_linux_amd64.zip -d /usr/local/bin
-  # Create kube config and set correct permissions on ubuntu user home directory
-  - mkdir /home/ubuntu/.kube && kubectl config view --raw > /home/ubuntu/.kube/config
-  - chmod 400 /home/ubuntu/.kube/config
-  - chown -R ubuntu:ubuntu /home/ubuntu
   # Configure shellinabox port and disable ssl then restart
   - sed -i 's/SHELLINABOX_PORT=4200/SHELLINABOX_PORT=6501/'  /etc/default/shellinabox
   - sed -i "s/\"--no-beep\"/\"--no-beep --disable-ssl\"/" /etc/default/shellinabox
@@ -110,4 +106,8 @@ runcmd:
   - bash /usr/local/bin/local-setup.sh
   # Install K3s
   - curl -sfL https://get.k3s.io | sh -
+  # Create kube config and set correct permissions on ubuntu user home directory
+  - mkdir /home/ubuntu/.kube && kubectl config view --raw > /home/ubuntu/.kube/config
+  - chmod 400 /home/ubuntu/.kube/config
+  - chown -R ubuntu:ubuntu /home/ubuntu
   - /usr/local/bin/kubectl apply -f /home/ubuntu/o11y-bootcamp/k3s/registry/registry.yaml
