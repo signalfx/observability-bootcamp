@@ -98,8 +98,9 @@ plugins:
       nav_translations:
 
 nav:
-  - Home: index.md
-  - Observability Bootcamp: tml/index.md
+  - Observability Bootcamp: index.md
+  - "Lab 1: OpenTelemetry & Get Data In": tml/lab-otel-gdi.md
+  - "Lab 2: OpenTelemetry instrumentation": tml/lab-otel-apm.md
   - Resources:
     - Cheatsheet: resources/cheatsheet.md
     - Links: resources/index.md
