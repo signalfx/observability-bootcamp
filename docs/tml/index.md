@@ -1,44 +1,4 @@
-# Goals
-
-
-## OpenTelemetry & Get Data In
-
-1. On metrics, traces and logs.
-    1. Metrics
-        - types
-        - metadata: dimensions, tags, properties
-    1. Traces
-        - Spans
-        - types: producer/consumer,
-        - metadata: attributes, baggage, links
-        - scope
-        - propagation
-    1. Logs (not enough standardization yet)
-
-1. Understand components involved for GDI:
-    1. Smart Agent
-
-    1. OTel Collector
-        1. `receiver`
-        1. `processor`
-        1. `exporter`
-        1. `pipeline`
-        1. `extensions`
-        1. `service`
-        1. operation modes
-            1. agent
-            1. gateway
-        1. `receivercreator`
-1. Visibility into Otel GDI/roadmap
-
-See [Blog post][roadmap] for context.
-
-[roadmap]: https://www.splunk.com/en_us/blog/devops/what-s-new-in-opentelemetry-community-distributions-and-roadmap.html
-
-fluentd -> otel native logging
-metrics.
-
-## Lab: OpenTelemetry & Get Data In
+# Lab: OpenTelemetry & Get Data In
 
 We are going to work in the directory `bootcamp/service/src`.
 Your first task: Write a python app to count words in a text file.
@@ -55,7 +15,7 @@ This section will introduce the format for this workshop.
 
 1. We use `git` branches to provide important milestones after a task is complete. If you did not complete a specific task, you can use these milestones to proceed to the next task or review the solution.
 
-### Getting started
+## Getting started
 
 The task is to write a python app to count words in a text file.
 Here is how to get to the milestone that completes this step:
@@ -88,6 +48,9 @@ This is because your work conflicts with changes on the milestone. You have the 
         ```bash
         git reset --hard && git clean -fdx && git checkout service
         ```
+    
+    You will have to re-apply any local changes like settings tokens or names.
+
 
 1. To preserve your work but move it out of the way, you can use
     
@@ -104,6 +67,8 @@ This is because your work conflicts with changes on the milestone. You have the 
         ```bash
         git checkout main && git stash pop
         ```
+
+    Sometimes you run into conflicting changes with this approach. We recommend you use the first option in this case.
 
 1. During development changes are recorded by adding and commiting to the repository. This is not necessary for this workshop.
 
@@ -125,9 +90,23 @@ To compare what you have with a milestone, , e.g. the milestone `service` use
     git diff ..01service
     ```
 
-TODO output
+=== "Example Output (excerpt)"
 
-### Task 1: Service
+    ```bash
+    ...
+    diff --git a/bootcamp/service/src/app.py b/bootcamp/service/src/app.py
+    index 9bcae83..b7fc141 100644
+    --- a/bootcamp/service/src/app.py
+    +++ b/bootcamp/service/src/app.py
+    @@ -1,10 +1,12 @@
+    +import json
+     import re
+    -from unicodedata import category
+    +from flask import Flask, request, Response
+    ...
+    ```
+
+## Task 1: Service
 
 If you have not done so already, checkout the milestone for this task:
 
@@ -137,13 +116,13 @@ If you have not done so already, checkout the milestone for this task:
     git reset --hard && git clean -fdx && git checkout 01service
     ```
 
-Let's get python sorted quickly. If you're on a Mac:
+Let's get python sorted quickly. On a provided AWS instance, `python3` is available.
+
+If you're on a Mac:
 
 ```bash
 brew install python@3
 ```
-
-Then use `python3` instead of `python` everywhere.
 
 On another system, install a recent version of python (i.e. 3.x) with your package manager.
 
@@ -152,10 +131,10 @@ Run the provided python service:
 === "Shell Command"
 
     ```bash
-    python -m venv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
-    .venv/bin/pip install -r requirements.txt
-    python app.py
+    pip install -r requirements.txt
+    python3 app.py
     ```
 
 === "Example Output"
@@ -185,7 +164,28 @@ Then test the service (in a separate shell) with:
     [["in", 436], ["hamlet", 484], ["my", 514], ["a", 546], ["i", 546], ["you", 550], ["of", 671], ["to", 763], ["and", 969], ["the", 1143]]%
     ```
 
-### Task 2: Prometheus Metrics
+The bootcamp contains other text files at `~/nlp/resources/corpora`. To use a random example:
+
+=== "Shell Command"
+    
+    ```bash
+    SAMPLE=$(find ~/nlp/resources/corpora/gutenberg -name '*.txt' | shuf -n1)
+    curl -X POST http://127.0.0.1:5000/wordcount -F text=@$SAMPLE
+    ```
+
+To generate load:
+
+=== "Shell Command"
+
+    ```bash
+    FILES=$(find ~/nlp/resources/corpora/gutenberg -name '*.txt')
+    while true; do
+        SAMPLE=$(shuf -n1 <<< "$FILES")
+        curl -X POST http://127.0.0.1:5000/wordcount -F text=@${SAMPLE}
+        sleep 1
+    done
+
+## Task 2: Prometheus Metrics
 
 We need visibility into performance - let us add metrics with [Prometheus][prometheus].
 
@@ -237,11 +237,17 @@ Test that the application exposes metrics by hitting the endpoint while the app 
 
 The milestone for this task is `02service-metrics`.
 
-TODO add references:
 [prometheus]: https://prometheus.io/docs/introduction/overview/#architecture
 [py-prom]: https://pypi.org/project/prometheus-client/
 
-### Task 3: OpenTelemetry Collector
+## Task 3: OpenTelemetry Collector
+
+You will need an access token for Splunk Observability Cloud. Set them up as environment variables:
+
+```
+export SPLUNK_ACCESS_TOKEN=YOURTOKEN
+export SPLUNK_REAM=YOURREALM
+```
 
 Create a file called `collector.yaml` in the src directory and add the [configuration][otel-config] for the [OpenTelemetry Collector][otel-col] in this file. Then [run it in a docker container][otel-docker]:
 
@@ -249,8 +255,8 @@ Create a file called `collector.yaml` in the src directory and add the [configur
 
     ```bash
     docker run --rm \
-        -e SPLUNK_ACCESS_TOKEN=YOUR_TOKEN \
-        -e SPLUNK_REALM=eu0 \
+        -e SPLUNK_ACCESS_TOKEN=${SPLUNK_ACCESS_TOKEN} \
+        -e SPLUNK_REALM=${SPLUNK_REALM} \
         -e SPLUNK_CONFIG=/etc/collector.yaml \
         -p 13133:13133 -p 14250:14250 -p 14268:14268 -p 4317:4317 \
         -p 6060:6060 -p 8888:8888 -p 9080:9080 -p 9411:9411 -p 9943:9943 \
@@ -264,7 +270,7 @@ The milestone for this task is `03service-metrics-otel`.
 [otel-col]: https://github.com/signalfx/splunk-otel-collector
 [otel-docker]: https://github.com/signalfx/splunk-otel-collector/blob/main/docs/getting-started/linux-manual.md#docker
 
-### Task 4: Capture Prometheus metrics
+## Task 4: Capture Prometheus metrics
 
 Add a [prometheus receiver][prom-recv] to the the otel config so that it captures the metrics introduced in Task 2 from the application.
 
@@ -274,7 +280,7 @@ The milestone for this task is `04service-metrics-prom`.
 
 [prom-recv]: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/simpleprometheusreceiver
 
-### Task 5: Dockerize the Service
+## Task 5: Dockerize the Service
 
 Dockerize the service. Use this Dockerfile as a skeleton:
 
@@ -303,8 +309,8 @@ Then build and run the image:
 === "Shell Command"
 
     ```bash
-    docker build . -t YOURNAME/wordcount
-    docker run -p 5000:5000 YOURNAME/wordcount:latest
+    docker build . -t wordcount
+    docker run -p 5000:5000 wordcount:latest
     ```
 
 Test the service in another shell:
@@ -319,7 +325,7 @@ The milestone for this task is `05docker`.
 
 [docker-cmd]: https://docs.docker.com/engine/reference/builder/#cmd
 
-### Task 6: Docker Compose
+## Task 6: Docker Compose
 
 The development team wants to use a containerized [redis][redis] cache to improve performance of the service.
 
@@ -358,27 +364,16 @@ The milestone for this task is `06docker-compose`.
 [redis]: https://redis.io/
 [docker-compose]: https://docs.docker.com/compose/
 
-### Task 7: Container orchestration
+## Task 7: Container orchestration
 
-Add the [OpenTelemetry Collector service definition][otel-compose] to the docker-compose setup. You should put your access data for Observability Cloud in a new file called `.env`:
+Add the [OpenTelemetry Collector service definition][otel-compose] to the docker-compose setup.
 
-```bash
-SPLUNK_ACCESS_TOKEN=YOURTOKEN
-SPLUNK_REALM=eu0
-```
-
-The `.env` will be picked up automatically by `docker-compose up`.
-For a different name, you can use:
-
-```bash
-docker-compose --env-file=./your-env-file.env up
-```
 
 The milestone for this task is `07docker-compose-otel`.
 
 [otel-compose]: https://github.com/signalfx/splunk-otel-collector/tree/main/examples/docker-compose
 
-### Task 8: Monitor containerized service
+## Task 8: Monitor containerized service
 
 The development team has started using other containerized services with docker compose. Switch to the provided milestone `08docker-compose-redis` with the instructions from "Getting Started".
 
@@ -389,18 +384,11 @@ The milestone for this task is `08docker-compose-redis-otel`.
 [redis]: https://redis.io/
 [redis-mon]: https://docs.splunk.com/Observability/gdi/redis/redis.html
 
-### Task 9: Kubernetes
+## Task 9: Kubernetes
 
 The development team has started using [Kubernetes][kubernetes] for container orchestration. Switch to the provided milestone `09k8s` with the instructions from "Getting Started".
 
-Deploy a private container registry with the provided setup:
-
-```bash
-kubectl apply -f registry.yaml
-```
-TODO PATH
-
-Then rebuild the container images:
+Rebuild the container images for the private registry:
 
 ```bash
 docker-compose build
@@ -421,11 +409,15 @@ kubectl apply -f k8s
 Test the service with
 
 ```bash
-
+ENDPOINT=$(kubectl get service/wordcount -o jsonpath='{.spec.clusterIP}')
+curl http://$ENDPOINT:8000/wordcount -F text=@hamlet.txt
 ```
 
-Configure and add an OpenTelemetry Collector to the environment using [Splunk's helm chart][splunk-otel-helm].
-Review the [configuration how-to][otel-docs] and the [advanced configuration][otel-adv-cfg] to create a `values.yaml` that addds the required receivers for redis and prometheus.
+Configure and install an OpenTelemetry Collector using [Splunk's helm chart][splunk-otel-helm]:
+
+1. Review the [configuration how-to][otel-docs] and the [advanced configuration][otel-adv-cfg] to create a `values.yaml` that adds the required receivers for redis and prometheus.
+
+1. Use the environment variables for realm,token and cluster name and pass them to `helm` as arguments.
 
 The milestone for this task is `09k8s-otel`.
 
@@ -434,11 +426,16 @@ The milestone for this task is `09k8s-otel`.
 [otel-docs]: https://github.com/signalfx/splunk-otel-collector-chart#how-to-install
 [otel-adv-cfg]: https://github.com/signalfx/splunk-otel-collector-chart/blob/main/docs/advanced-configuration.md
 
-### Task 10: Microservices
+# Lab: Application Performance Monitoring
 
-The development team has broken up the containerized service into microservices. Switch to the provided milestone `09microservices` with the instructions from "Getting Started".
+1. Understand GDI path for APM for common tech stacks (Docker, K8s).
+1. Be able to instrument an app from scratch (traces, custom metadata).
+1. Understand how distributed tracing works across tech stacks (header propagation, …)
+1. Understand positioning vs. trad. APM vendors
 
-Adjust the OpenTelemetry Collector configuration so that it picks up metrics from all microservices.
+## Task 10: Microservices Auto-instrumentation
+
+The development team has broken up the monolithic service into microservices baesd on the `docker-compose` setup. Switch to the provided milestone `10microservices` with the instructions from "Getting Started".
 
 Test the service with
 
@@ -446,24 +443,76 @@ Test the service with
 curl -X POST http://127.0.0.1:8000/api -F text=@hamlet.txt
 ```
 
-The milestone for this task is `10microservices-metrics`.
+Add auto-instrumentation to the `public_api` microservice using the [Splunk distribution of OpenTelemetry Python][splunk-otel-python]. Review the [documentation][splunk-py-instrument] and the [Getting Started] steps and apply it to `Dockerfile`.
 
-1. Understand components involved
-    1. Grab metrics from Prometheus endpoint
-    1. Add dimension to metric
-    1. Grab logs from app
-    1. Troubleshooting
+Take into account the [trace exporter][otel-py-exporter] settings and add the required environment variables to the `.env` file for `docker-compose`. Use the configuration to send traces directly to Splunk  Observability Cloud.
 
-## Lab: Application Performance Monitoring (incl. Profiling)
+The milestone for this task is `10microservices-autoi`. It has auto-instrumentation applied for *all* microservices.
 
-1. Understand GDI path for APM for important tech stacks (Docker, K8s)
+[splunk-otel-python]: https://github.com/signalfx/splunk-otel-python
+[getting-started]: https://github.com/signalfx/splunk-otel-python
+[otel-py-exporter]: https://github.com/signalfx/splunk-otel-python/blob/main/docs/advanced-config.md#trace-exporters
+[splunk-py-instrument]: https://docs.splunk.com/Observability/gdi/get-data-in/application/python/get-started.html#nav-Instrument-a-Python-application
 
-1. Be able to instrument an app from scratch (traces, custom metadata).
-    - palindrome service. Consists of microservices:
-        1. frontend
-        1. input-normalizer
-        1. is-string-equal
-        1. reverse-string
-1. Be able to start from nothing with an app from GitHub.
-1. Understand how distributed tracing works across tech stacks (header propagation, …)
-1. Understand positioning vs. trad. APM vendors
+## Task 11: Infrastructure Correlation
+
+There is not task 11 (yet).
+
+## Task 12: Instrumentation in Kubernetes
+
+The development team has started using Kubernetes for container orchestration. Switch to the provided milestone `12microservices-k8s` with the instructions from "Getting Started".
+
+The Kubernetes manifests are located in the `k8s` folder. Add auto-instrumentation to the `public_api` microservice `deployment` by configuring the [Splunk distribution of OpenTelemetry Python][splunk-otel-python]. The `Dockerfile` has already been prepared.
+
+Install the OpenTelemetry Collector to the environment using [Splunk's helm chart][splunk-otel-helm] and use the provided `values.yaml`:
+
+```bash
+helm install my-splunk-otel-collector --set="splunkObservability.realm=${SPLUNK_REALM},splunkObservability.accessToken=${SPLUNK_ACCESS_TOKEN},clusterName=${CLUSTER_NAME}" splunk-otel-collector-chart/splunk-otel-collector -f values.yaml
+```
+
+Rebuild the container images for the private registry:
+
+```bash
+docker-compose build
+```
+
+Push the images to the private registry:
+
+```bash
+docker-compose push
+``` 
+
+Deploy to the cluster with
+
+```bash
+kubectl apply -f k8s
+```
+
+Test the service with
+
+```bash
+ENDPOINT=$(kubectl get service/public-api -o jsonpath='{.spec.clusterIP}')
+curl http://$ENDPOINT:8000/api -F text=@hamlet.txt
+```
+
+The milestone for this task is `12microservices-k8s-autoi`. It has auto-instrumentation applied for *all* microservices.
+
+## Task 13: Using OpenTelemetry instrumentation
+
+
+## Future Tasks
+
+TODO YOUR Idea here? Let us know!
+
+TODO metrics method being traced - how to disable?
+
+```
+from opentelemetry.context import attach, detach, set_value
+token = attach(set_value("suppress_instrumentation", True))
+```
+
+TODO autodetect metrics with k8s labels: `prometheus.io/scrape: true` - run prometheus on separate port `9090`.
+
+TODO [tracing examples][py-trace-ex]
+
+[py-trace-ex]: https://github.com/open-telemetry/opentelemetry-python/blob/main/docs/examples/
