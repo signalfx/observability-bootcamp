@@ -18,9 +18,12 @@ This section will introduce the format for the labs used. The labs are provided 
 
 1. We will timebox self-paced content during a live workshop.
 
-1. We use `git` branches to provide important milestones after a task is complete. If you did not complete a specific task, you can use these milestones to proceed to the next task or review the solution.
+1. We use [`git`][git] [branches][git-branches] to provide important milestones after a task is complete or as a starting point for a task. If you did not complete a specific task, you can use these milestones to proceed to the next task or review the solution.
 
 1. We will wrap up the task with a group discussion / Q&A on:
     1. Why are customers doing this?
     1. What are the benefits of doing this?
     1. What are the implications?
+
+[git]: https://git-scm.com/about
+[git-branches]: https://backlog.com/git-tutorial/using-branches/
