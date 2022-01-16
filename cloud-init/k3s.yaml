@@ -111,3 +111,5 @@ runcmd:
   - chmod 400 /home/ubuntu/.kube/config
   - chown -R ubuntu:ubuntu /home/ubuntu
   - /usr/local/bin/kubectl apply -f /home/ubuntu/o11y-bootcamp/k3s/registry/registry.yaml
+  # Grab some text files
+  - git clone https://github.com/teropa/nlp /home/ubuntu/nlp
