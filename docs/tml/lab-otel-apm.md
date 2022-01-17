@@ -19,7 +19,7 @@ Test the service with:
     curl -X POST http://127.0.0.1:8000/api -F text=@hamlet.txt
     ```
 
-Add auto-instrumentation to the `public_api` microservice using the [Splunk distribution of OpenTelemetry Python][splunk-otel-python]. Review the [documentation][splunk-py-instrument] and the [Getting Started] steps and apply it to `Dockerfile`.
+Add auto-instrumentation to the `public_api` microservice using the [Splunk distribution of OpenTelemetry Python][splunk-otel-python]. Review the [documentation][splunk-py-instrument] and the [getting Started][splunk-py-instrument] steps and apply it to `Dockerfile`.
 
 Take into account the [trace exporter][otel-py-exporter] settings and add the required environment variables to the `.env` file for `docker-compose`. Use the configuration to send traces directly to Splunk  Observability Cloud.
 
@@ -32,7 +32,7 @@ The milestone for this task is `10microservices-autoi`. It has auto-instrumentat
 
 ## Task 11: Infrastructure Correlation
 
-There is not task 11 (yet).
+There is no task 11 (yet).
 
 ## Task 12: Instrumentation in Kubernetes
 
@@ -51,7 +51,6 @@ Install the OpenTelemetry Collector to the environment using [Splunk's helm char
 Rebuild the container images for the private registry:
 
 === "Shell Command"
-
 
     ```bash
     docker-compose build
@@ -83,6 +82,8 @@ Test the service with
     ```
 
 The milestone for this task is `12microservices-k8s-autoi`. It has auto-instrumentation applied for *all* microservices.
+
+[splunk-otel-helm]: https://github.com/signalfx/splunk-otel-collector-chart
 
 ## Task 13: Using OpenTelemetry instrumentation
 
