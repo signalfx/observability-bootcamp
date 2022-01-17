@@ -42,6 +42,7 @@ CHAIN2=(
 09k8s-otel
 12microservices-k8s
 12microservices-k8s-autoi
+13custom-instr
 )
 
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
