@@ -87,9 +87,13 @@ runcmd:
   # Download Bootcamp
   - git clone https://github.com/a-staebler/o11y-bootcamp /home/ubuntu/o11y-bootcamp
   # Checkout all branches
-  - cd /home/ubuntu/o11y-bootcamp && git branch -a --format '%(refname:lstrip=-1)' | grep -Evi 'main|head|gh-pages' | xargs -n1 git checkout
+  - export GIT_DIR=/home/ubuntu/o11y-bootcamp/.git
+  - export GIT_WORK_DIR=/home/ubuntu/o11y-bootcamp
+  - git branch -a --format '%(refname:lstrip=-1)' | grep -Evi 'main|head|gh-pages' | xargs -n1 git checkout
   # Switch to main
-  - cd /home/ubuntu/o11y-bootcamp && git checkout main
+  - git checkout main
+  - unset GIT_DIR
+  - unset GIT_WORK_DIR
   # Configure motd
   - curl -s https://raw.githubusercontent.com/signalfx/observability-workshop/master/cloud-init/motd -o /etc/motd
   - chmod -x /etc/update-motd.d/*
