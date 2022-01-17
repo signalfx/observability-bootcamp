@@ -117,7 +117,7 @@ If you are on a Mac:
 
 On another system, install a recent version of python (i.e. 3.x) with your package manager.
 
-Run the provided python service:
+Navigate to `o11y-bootcamp/service/src` and run the provided python service:
 
 === "Shell Command"
 
