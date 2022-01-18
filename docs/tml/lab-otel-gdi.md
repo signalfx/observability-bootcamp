@@ -175,6 +175,7 @@ To generate load:
         curl -X POST http://127.0.0.1:5000/wordcount -F text=@${SAMPLE}
         sleep 1
     done
+    ```
 
 ## Task 2: Prometheus Metrics
 
@@ -244,7 +245,7 @@ Start with the [default configuration][otel-config] for the [OpenTelemetry Colle
 
 You can also start with a blank configuration, which is what the milestone does for clarity.
 
-Then run OpenTelemetry Collector with this configuration [in a docker container][otel-docker]:
+Then run OpenTelemetry Collector with this configuration in a docker container:
 
 === "Shell Command"
 
@@ -279,7 +280,7 @@ The milestone for this task is `04service-metrics-prom`.
 
 ## Task 5: Dockerize the Service
 
-Dockerize the service. Use this Dockerfile as a skeleton:
+Dockerize the service. Use this `Dockerfile` as a skeleton:
 
 ```docker
 ARG APP_IMAGE=python:3
@@ -300,6 +301,8 @@ ENV PATH="/app/.venv/bin:$PATH"
 ```
 
 Add the [appropriate `CMD`][docker-cmd] at the end to launch the app.
+
+Stop other instances of the app if you had any running.
 
 Then build and run the image:
 
@@ -326,7 +329,9 @@ The milestone for this task is `05docker`.
 
 The development team wants to use a containerized [redis][redis] cache to improve performance of the service.
 
-Add a [docker-compose][docker-compose] setup for the python app to prepare us for running multiple containers.
+Stop any other running containers from this app or the OpenTelemetry Collector.
+
+Add a [`docker-compose.yaml`][docker-compose] file for the python app to prepare us for running multiple containers.
 
 A skeleton to run the service on port 8000 might look like this. What port do you need to map 8000 to for the service to work?
 
@@ -365,7 +370,6 @@ The milestone for this task is `06docker-compose`.
 
 Add the [OpenTelemetry Collector service definition][otel-compose] to the docker-compose setup.
 
-
 The milestone for this task is `07docker-compose-otel`.
 
 [otel-compose]: https://github.com/signalfx/splunk-otel-collector/tree/main/examples/docker-compose
@@ -375,6 +379,10 @@ The milestone for this task is `07docker-compose-otel`.
 The development team has started using other containerized services with docker compose. Switch to the provided milestone `08docker-compose-redis` with the instructions from "Getting Started".
 
 Add configuration to the OpenTelemetry Collector to monitor the redis cache.
+
+Check that you are getting data in the Redis dashboard:
+
+![Redis dashboard](../images/redis-dashboard.png)
 
 The milestone for this task is `08docker-compose-redis-otel`.
 
