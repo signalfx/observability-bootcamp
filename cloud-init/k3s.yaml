@@ -78,6 +78,21 @@ write_files:
       fi
       export INSTANCE
 
+      # Checkout all branches
+      export GIT_DIR=/home/ubuntu/o11y-bootcamp/.git
+      export GIT_WORK_DIR=/home/ubuntu/o11y-bootcamp
+      git branch -a --format '%(refname:lstrip=-1)' | grep -Evi 'main|head|gh-pages' | xargs -n1 git checkout
+      # Switch to main
+      git checkout main
+      unset GIT_DIR
+      unset GIT_WORK_DIR
+      # setup milestones for diff
+      for branch in $(git branch --all | grep '^\s*remotes' | grep -v -E '(:?HEAD|master|main|gh-pages)$'); do
+          br="${branch##*/}"
+          mkdir -p /home/ubuntu/milestones/"$br"
+          git archive --format tar "$br"| tar xf - -C /home/ubuntu/milestones/"$br"/
+      done
+
 runcmd:
   # Install Helm
   - curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
@@ -86,14 +101,6 @@ runcmd:
   - tar xfz k9s_Linux_x86_64.tar.gz -C /usr/local/bin/ k9s
   # Download Bootcamp
   - git clone https://github.com/a-staebler/o11y-bootcamp /home/ubuntu/o11y-bootcamp
-  # Checkout all branches
-  - export GIT_DIR=/home/ubuntu/o11y-bootcamp/.git
-  - export GIT_WORK_DIR=/home/ubuntu/o11y-bootcamp
-  - git branch -a --format '%(refname:lstrip=-1)' | grep -Evi 'main|head|gh-pages' | xargs -n1 git checkout
-  # Switch to main
-  - git checkout main
-  - unset GIT_DIR
-  - unset GIT_WORK_DIR
   # Configure motd
   - curl -s https://raw.githubusercontent.com/signalfx/observability-workshop/master/cloud-init/motd -o /etc/motd
   - chmod -x /etc/update-motd.d/*
