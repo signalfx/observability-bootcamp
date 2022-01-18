@@ -256,7 +256,7 @@ Then run OpenTelemetry Collector with this configuration [in a docker container]
         -p 13133:13133 -p 14250:14250 -p 14268:14268 -p 4317:4317 \
         -p 6060:6060 -p 8888:8888 -p 9080:9080 -p 9411:9411 -p 9943:9943 \
         -v "${PWD}/collector.yaml":/etc/collector.yaml:ro \
-        --name otelcol quay.io/signalfx/splunk-otel-collector:v0.41.1
+        --name otelcol quay.io/signalfx/splunk-otel-collector:0.41.1
     ```
 
 The milestone for this task is `03service-metrics-otel`.
