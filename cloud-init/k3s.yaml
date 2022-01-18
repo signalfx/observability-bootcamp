@@ -84,14 +84,14 @@ write_files:
       git branch -a --format '%(refname:lstrip=-1)' | grep -Evi 'main|head|gh-pages' | xargs -n1 git checkout
       # Switch to main
       git checkout main
-      unset GIT_DIR
-      unset GIT_WORK_DIR
       # setup milestones for diff
       for branch in $(git branch --all | grep '^\s*remotes' | grep -v -E '(:?HEAD|master|main|gh-pages)$'); do
           br="${branch##*/}"
           mkdir -p /home/ubuntu/milestones/"$br"
           git archive --format tar "$br"| tar xf - -C /home/ubuntu/milestones/"$br"/
       done
+      unset GIT_DIR
+      unset GIT_WORK_DIR
 
 runcmd:
   # Install Helm
