@@ -237,7 +237,7 @@ You will need an access token for Splunk Observability Cloud. Set them up as env
 
 ```bash
 export SPLUNK_ACCESS_TOKEN=YOURTOKEN
-export SPLUNK_REAM=YOURREALM
+export SPLUNK_REALM=YOURREALM
 ```
 
 Start with the [default configuration][otel-config] for the [OpenTelemetry Collector][otel-col]  and name it `collector.yaml` in the `src` directory.
