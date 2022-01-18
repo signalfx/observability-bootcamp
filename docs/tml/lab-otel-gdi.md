@@ -240,7 +240,11 @@ export SPLUNK_ACCESS_TOKEN=YOURTOKEN
 export SPLUNK_REAM=YOURREALM
 ```
 
-Create a file called `collector.yaml` in the src directory and add the [configuration][otel-config] for the [OpenTelemetry Collector][otel-col] in this file. Then [run it in a docker container][otel-docker]:
+Start with the [default configuration][otel-config] for the [OpenTelemetry Collector][otel-col]  and name it `collector.yaml` in the `src` directory.
+
+You can also start with a blank configuration, which is what the milestone does for clarity.
+
+Then run OpenTelemetry Collector with this configuration [in a docker container][otel-docker]:
 
 === "Shell Command"
 
@@ -263,7 +267,7 @@ The milestone for this task is `03service-metrics-otel`.
 
 ## Task 4: Capture Prometheus metrics
 
-Add a [prometheus receiver][prom-recv] to the OpenTelemetry Collector so that it captures the metrics introduced in Task 2 from the application.
+Add a [prometheus receiver][prom-recv] to the OpenTelemetry Collector configuration so that it captures the metrics introduced in Task 2 from the application.
 
 Hint: The hostname `host.docker.internal` allows you to access the host from within a docker container.
 
