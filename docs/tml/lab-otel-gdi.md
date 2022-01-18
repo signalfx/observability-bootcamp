@@ -71,12 +71,12 @@ To compare two milestones, use
     git diff main..01service
     ```
 
-To compare what you have with a milestone, , e.g. the milestone `service` use
+To compare what you have with a milestone, , e.g. the milestone `01service` use
 
 === "Shell Command"
 
     ```bash
-    git diff ..01service
+    diff -ru $(git rev-parse --show-toplevel) ~/tmp/milestones/01service
     ```
 
 === "Example Output (excerpt)"
