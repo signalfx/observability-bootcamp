@@ -33,6 +33,8 @@ spec:
               value: http://$(SPLUNK_OTEL_AGENT):4317
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: deployment.environment=YOURNAME-dev
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.version=1.13
             - name: OTEL_SERVICE_NAME
               value: public-api
             - name: REDIS_URL
