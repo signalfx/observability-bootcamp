@@ -5,99 +5,9 @@ Your first task: Write a python app to count words in a text file.
 
 *No, wait - we've already done that for you*.
 
-## Getting started
-
-The task is to write a python app to count words in a text file.
-Here is how to get to the milestone that completes this step:
-
-=== "Shell Command"
-
-    ```bash
-    git checkout 01service
-    ```
-
-This will put you on the first milestone.
-
-In case you have already worked on a milestone, you might see an error like:
-
-=== "Example Output"
-
-    ```bash
-    error: Your local changes to the following files would be overwritten by checkout:
-        app.py
-    Please commit your changes or stash them before you switch branches.
-    Aborting
-    ```
-
-This is because your work conflicts with changes on the milestone. You have the following options:
-
-1. If you have worked on a task and want to progress to the next one *and DROP all your changes*:
-
-    === "Shell Command"
-
-        ```bash
-        git reset --hard && git clean -fdx && git checkout 01service
-        ```
-
-    You will have to re-apply any local changes like settings tokens or names.
-
-1. To preserve your work but move it out of the way, you can use
-
-    === "Shell Command"
-
-        ```bash
-        git stash && git checkout service
-        ```
-
-    To restore your work, switch to the previous milestone (`main` in this case) and retrieve the stashed changes:
-
-    === "Shell Command"
-
-        ```bash
-        git checkout main && git stash pop
-        ```
-
-    Sometimes you run into conflicting changes with this approach. We recommend you use the first option in this case.
-
-1. During development changes are recorded by adding and commiting to the repository. This is not necessary for this workshop.
-
-Use the first option and proceed.
-
-To compare two milestones, use
-
-=== "Shell Command"
-
-    ```bash
-    git diff main..01service
-    ```
-
-To compare what you have with a milestone, , e.g. the milestone `01service` use
-
-=== "Shell Command"
-
-    ```bash
-    diff -ru $(git rev-parse --show-toplevel) ~/tmp/milestones/01service
-    ```
-
-=== "Example Output (excerpt)"
-
-    ```bash
-    ...
-    diff --git a/bootcamp/service/src/app.py b/bootcamp/service/src/app.py
-    index 9bcae83..b7fc141 100644
-    --- a/bootcamp/service/src/app.py
-    +++ b/bootcamp/service/src/app.py
-    @@ -1,10 +1,12 @@
-    +import json
-     import re
-    -from unicodedata import category
-    +from flask import Flask, request, Response
-    ...
-    ```
-
 ## Task 1: Service
 
-If you have not done so already, checkout the milestone for this task:
+Checkout the milestone for this task. See the introduction for a brief howto.
 
 === "Shell Command"
 
@@ -141,7 +51,7 @@ Navigate to `o11y-bootcamp/bootcamp/service/src` and run the provided python ser
      * Running on http://10.42.1.202:5000/ (Press CTRL+C to quit)
     ```
 
-Then test the service (in a separate shell in the `o11y-bootcamp/bootcamp/service/src` directory) with:
+Then test the service in a separate shell in the `~/o11y-bootcamp/bootcamp/service/src` directory with:
 
 === "Shell Command"
 
@@ -271,7 +181,14 @@ The milestone for this task is `03service-metrics-otel`.
 
 Add a [prometheus receiver][prom-recv] to the OpenTelemetry Collector configuration so that it captures the metrics introduced in Task 2 from the application.
 
-Hint: The hostname `host.docker.internal` allows you to access the host from within a docker container.
+Hint: The hostname `host.docker.internal` allows you to access the host from within a docker container. Add
+
+    ```
+    --add-host=host.docker.internal:host-gateway
+    ```
+
+to the
+
 
 Validate that you are getting data for the custom metric `characters_recv_total` introduced in Task 2.
 

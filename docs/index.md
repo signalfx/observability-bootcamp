@@ -25,5 +25,94 @@ This section will introduce the format for the labs used. The labs are provided 
     1. What are the benefits of doing this?
     1. What are the implications?
 
+## How to use milestones
+
+Here is how to get to the milestone called `01service`:
+
+=== "Shell Command"
+
+    ```bash
+    git checkout 01service
+    ```
+
+This will put you on the git branch named `01service`.
+
+In case you have already worked on content, you might see an error like:
+
+=== "Example Output"
+
+    ```bash
+    error: Your local changes to the following files would be overwritten by checkout:
+        app.py
+    Please commit your changes or stash them before you switch branches.
+    Aborting
+    ```
+
+This is because your work conflicts with changes on the milestone. You have the following options:
+
+1. If you have worked on a task and want to progress to the next one *and DROP all your changes*:
+
+    === "Shell Command"
+
+        ```bash
+        git reset --hard && git clean -fdx && git checkout 01service
+        ```
+
+    You will have to re-apply any local changes like settings tokens or names.
+
+1. To preserve your work, but move it out of the way, you can use
+
+    === "Shell Command"
+
+        ```bash
+        git stash && git checkout service
+        ```
+
+    To restore your work, switch to the task you were working on (e.g. `01service`) and retrieve the stashed changes:
+
+    === "Shell Command"
+
+        ```bash
+        git checkout 01service && git stash pop
+        ```
+
+    Sometimes you run into conflicting changes with this approach. We recommend you use the first option in this case.
+
+1. Developers use git commits to recorded changes. This is not necessary for this workshop.
+
+## How to compare (with) milestones
+
+To compare two milestones, use
+
+=== "Shell Command"
+
+    ```bash
+    git diff main..01service
+    ```
+
+To compare what you have with a milestone, , e.g. the milestone `01service` use
+
+=== "Shell Command"
+
+    ```bash
+    msdiff 01service
+    ```
+
+=== "Example Output (excerpt)"
+
+    ```bash
+    ...
+    diff --git a/bootcamp/service/src/app.py b/bootcamp/service/src/app.py
+    index 9bcae83..b7fc141 100644
+    --- a/bootcamp/service/src/app.py
+    +++ b/bootcamp/service/src/app.py
+    @@ -1,10 +1,12 @@
+    +import json
+     import re
+    -from unicodedata import category
+    +from flask import Flask, request, Response
+    ...
+    ```
+
 [git]: https://git-scm.com/about
 [git-branches]: https://backlog.com/git-tutorial/using-branches/
