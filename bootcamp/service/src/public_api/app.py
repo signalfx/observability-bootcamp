@@ -7,6 +7,8 @@ from prometheus_client.exposition import CONTENT_TYPE_LATEST
 from prometheus_client import Counter
 import redis
 import requests
+import random
+from opentelemetry import trace
 
 
 def _normalize(text):
@@ -40,6 +42,10 @@ def wordcount():
     fn = file.filename
 
     cached = r.get(fn)
+    
+    choice = random.choice(["blue", "green", "red"])
+    trace.get_current_span().set_attribute("color", choice)
+    trace.get_current_span().set_attribute("fileName", fn)
 
     if cached is not None:
         result = cached
