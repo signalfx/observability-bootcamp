@@ -87,6 +87,56 @@ The milestone for this task is `12microservices-k8s-autoi`. It has auto-instrume
 
 ## Task 13: Using OpenTelemetry instrumentation
 
+The business team want to add the service version, the customer profile that is defined by a color and the name of the analyzed file. Apply it to public-api.
+
+Switch to the provided milestone `13custom-instr` with the instructions from "Getting Started".
+
+The Kubernetes manifests are located in the `k8s` folder. Add the service version by configuring the OTEL ressources attribute [Splunk distribution of OpenTelemetry Python - Advanced Configuration](https://github.com/signalfx/splunk-otel-python/blob/main/docs/advanced-config.md#trace-configuration)
+
+The customer profile and the file name can be variable for each execution. Create attribute and assign it to your current span thanks to [OTEL python](https://opentelemetry-python.readthedocs.io/en/stable/faq-and-cookbook.html). You can use random function to generate the customer profile (red, blue, green).
+Don't forget to import modules.
+
+
+Rebuild the container images for the private registry:
+
+=== "Shell Command"
+
+    ```bash
+    docker-compose build
+    ```
+
+Push the images to the private registry:
+
+=== "Shell Command"
+
+    ```bash
+    docker-compose push
+    ```
+
+Deploy to the cluster with
+
+=== "Shell Command"
+
+    ```bash
+    kubectl apply -f k8s
+    ```
+
+Test the service with
+
+=== "Shell Command"
+
+    ```bash
+    ENDPOINT=$(kubectl get service/public-api -o jsonpath='{.spec.clusterIP}')
+    curl http://$ENDPOINT:8000/api -F text=@hamlet.txt
+    ```
+
+Verify in your APM traces that you retrieve all the informations asked.
+
+Now, Business team want to be able to compare the performance for each customer profile. [Index this span tag](https://docs.splunk.com/Observability/apm/span-tags/index-span-tags.html#index-a-new-span-tag) to be able to satisfy your Business team request.
+
+The milestone for this task is `13custom-instr`. It add custom instrumentation.
+
+
 ## Future Tasks
 
 TODO YOUR Idea here? Let us know!
