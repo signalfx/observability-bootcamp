@@ -40,6 +40,10 @@ write_files:
       alias kc='sudo kubectl'
       alias gs='git status'
       alias ..='cd ..'
+      msdiff() {
+        milestone=$1
+        diff -ru $(git rev-parse --show-toplevel) ~/tmp/milestones/"$milestone"
+      }
   - path: /etc/rancher/k3s/registries.yaml
     permissions: '0600'
     owner: root:root
