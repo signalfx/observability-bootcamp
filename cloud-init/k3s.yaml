@@ -44,6 +44,7 @@ write_files:
       alias gb='git branch'
       alias gco'git checkout'
       alias ..='cd ..'
+      alias msget='git reset --hard && git clean -fdx && git checkout'
       msdiff() {
         milestone=$1
         diff -ru $(git rev-parse --show-toplevel) ~/tmp/milestones/"$milestone"
