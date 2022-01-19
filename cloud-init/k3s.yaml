@@ -37,8 +37,12 @@ write_files:
       # Set prompt
       export PS1='\u@\h:\w$ '
       export KUBECONFIG=/home/ubuntu/.kube/config
-      alias kc='sudo kubectl'
+      alias kc='kubectl'
+      alias dc='docker-compose'
+      alias d='docker'
       alias gs='git status'
+      alias gb='git branch'
+      alias gco'git checkout'
       alias ..='cd ..'
       msdiff() {
         milestone=$1
