@@ -93,8 +93,11 @@ Switch to the provided milestone `13custom-instr` with the instructions from "Ge
 
 The Kubernetes manifests are located in the `k8s` folder. Add the service version by configuring the OTEL ressources attribute [Splunk distribution of OpenTelemetry Python - Advanced Configuration](https://github.com/signalfx/splunk-otel-python/blob/main/docs/advanced-config.md#trace-configuration)
 
-The customer profile and the file name can be variable for each execution. Create attribute and assign it to your current span thanks to [OTEL python](https://opentelemetry-python.readthedocs.io/en/stable/faq-and-cookbook.html). You can use random function to generate the customer profile (red, blue, green).
-Don't forget to import modules.
+The customer profile and the file name can be variable for each execution. Create attributes and assign them to your current span thanks to [OTEL python](https://opentelemetry-python.readthedocs.io/en/stable/faq-and-cookbook.html). You can use random function to generate the customer profile (red, blue, green).
+
+Note 1 : Don't use temporary variable to retrieve the current span. Use the trace directly.
+
+Note 2 : Don't forget to import modules.
 
 
 Rebuild the container images for the private registry:
@@ -112,8 +115,15 @@ Push the images to the private registry:
     ```bash
     docker-compose push
     ```
+Delete the actual public-api deployment
 
-Deploy to the cluster with
+=== "Shell Command"
+
+    ```bash
+    kubectl delete deploy public-api
+    ```
+
+Redeploy to the cluster with
 
 === "Shell Command"
 
