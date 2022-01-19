@@ -49,7 +49,7 @@ write_files:
       alias d='docker'
       alias gs='git status'
       alias gb='git branch'
-      alias gco'git checkout'
+      alias gco='git checkout'
       alias ..='cd ..'
       alias msget='git reset --hard && git clean -fdx && git checkout'
       msdiff() {
