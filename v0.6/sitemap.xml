@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://a-staebler.github.io/o11y-bootcamp/v0.6/</loc>
+         <lastmod>2022-01-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://a-staebler.github.io/o11y-bootcamp/v0.6/resources/</loc>
+         <lastmod>2022-01-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://a-staebler.github.io/o11y-bootcamp/v0.6/resources/cheatsheet/</loc>
+         <lastmod>2022-01-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://a-staebler.github.io/o11y-bootcamp/v0.6/resources/faq/</loc>
+         <lastmod>2022-01-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://a-staebler.github.io/o11y-bootcamp/v0.6/tml/lab-otel-apm/</loc>
+         <lastmod>2022-01-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://a-staebler.github.io/o11y-bootcamp/v0.6/tml/lab-otel-gdi/</loc>
+         <lastmod>2022-01-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>
