@@ -1,6 +1,6 @@
 # Lab: OpenTelemetry & Get Data In
 
-We are going to work in the directory `o11y-bootcamp/service/src`.
+We are going to work in the directory `o11y-bootcamp/bootcamp/service/src`.
 Your first task: Write a python app to count words in a text file.
 
 *No, wait - we've already done that for you*.
@@ -36,7 +36,7 @@ This is because your work conflicts with changes on the milestone. You have the 
     === "Shell Command"
 
         ```bash
-        git reset --hard && git clean -fdx && git checkout service
+        git reset --hard && git clean -fdx && git checkout 01service
         ```
 
     You will have to re-apply any local changes like settings tokens or names.
@@ -117,7 +117,7 @@ If you are on a Mac:
 
 On another system, install a recent version of python (i.e. 3.x) with your package manager.
 
-Navigate to `o11y-bootcamp/service/src` and run the provided python service:
+Navigate to `o11y-bootcamp/bootcamp/service/src` and run the provided python service:
 
 === "Shell Command"
 
@@ -141,7 +141,7 @@ Navigate to `o11y-bootcamp/service/src` and run the provided python service:
      * Running on http://10.42.1.202:5000/ (Press CTRL+C to quit)
     ```
 
-Then test the service (in a separate shell) with:
+Then test the service (in a separate shell in the `o11y-bootcamp/bootcamp/service/src` directory) with:
 
 === "Shell Command"
 
@@ -188,10 +188,11 @@ Install the [Python Prometheus client][py-prom] as a dependency:
     ```bash
     echo "prometheus-client" >> requirements.txt
     python3 -m venv .venv
+    source .venv/bin/activate
     .venv/bin/pip install -r requirements.txt
     ```
 
-Import the modules in `app.py`:
+Import the modules by editing `app.py`. These imports go towards the top of the file:
 
 ```python
 import prometheus_client
@@ -370,6 +371,8 @@ The milestone for this task is `06docker-compose`.
 
 Add the [OpenTelemetry Collector service definition][otel-compose] to the docker-compose setup.
 
+Rebuild the docker-compose stack and run it.
+
 The milestone for this task is `07docker-compose-otel`.
 
 [otel-compose]: https://github.com/signalfx/splunk-otel-collector/tree/main/examples/docker-compose
@@ -378,7 +381,9 @@ The milestone for this task is `07docker-compose-otel`.
 
 The development team has started using other containerized services with docker compose. Switch to the provided milestone `08docker-compose-redis` with the instructions from "Getting Started".
 
-Add configuration to the OpenTelemetry Collector to monitor the redis cache.
+Add the [redis monitor][redis-mon] to the OpenTelemetry Collector configuration in `collector.yaml` to get metrics from the [redis cache].
+
+Rebuild the docker-compose stack and run it.
 
 Check that you are getting data in the Redis dashboard:
 
