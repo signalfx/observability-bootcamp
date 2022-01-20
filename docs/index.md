@@ -55,10 +55,18 @@ This is because your work conflicts with changes on the milestone. You have the 
     === "Shell Command"
 
         ```bash
+        msget 01service
+        ```
+
+    This is a shell alias to a git command we provide on the instances and identical to running:
+
+    === "Shell Command"
+
+        ```bash
         git reset --hard && git clean -fdx && git checkout 01service
         ```
 
-    You will have to re-apply any local changes like settings tokens or names.
+    You will have to re-apply any local changes to files like settings tokens or names.
 
 1. To preserve your work, but move it out of the way, you can use
 
@@ -78,7 +86,7 @@ This is because your work conflicts with changes on the milestone. You have the 
 
     Sometimes you run into conflicting changes with this approach. We recommend you use the first option in this case.
 
-1. Developers use git commits to recorded changes. This is not necessary for this workshop.
+1. Developers use git commits to record changes and rebase or merge their work. This is not necessary for this workshop.
 
 ## How to compare (with) milestones
 
